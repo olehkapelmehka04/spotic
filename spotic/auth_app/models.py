@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser
 
 
 class CustomUser(AbstractUser):
+    class 
+    
     role = models.CharField(
         max_length=20,
         choices=[
@@ -21,13 +23,15 @@ class CustomUser(AbstractUser):
         ],
         default="active",
     )
-    balance = models.DecimalField(
-        default=Decimal(0),
-        decimal_places=2,
-        max_digits=12,
-    )
-    create_at = models.DateField(auto_now_add=True)
 
+
+class MusicEstimation(models.Model):
+    music = models.ForeignKey(
+        Track,
+        on_delete=models.CASCADE,
+    )
+    estimation = models.CharField(choices=[("dislike", "Дизлайк"), ("like", "Лайк"), ("listen", "Прослушан")])
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="musicestimations")
 
 class MusicProfile(models.Model):
     user = models.OneToOneField(
