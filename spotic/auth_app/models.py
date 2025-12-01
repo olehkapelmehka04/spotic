@@ -1,13 +1,38 @@
 from decimal import Decimal
-
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
-
+class CustomUser(AbstractUser):
+    role = models.CharField(
+        max_length=20,
+        choices=[
+            ("listener", "Слушатель"),
+            ("singer", "Исполнитель"),
+            ("admin", "Администратор"),
+        ],
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("active", "Активный"),
+            ("freze", "Замороженный"),
+            ("block", "Заблокированный"),
+        ],
+        default="active",
+    )
+    balance = models.DecimalField(
+        default=Decimal(0),
+        decimal_places=2,
+        max_digits=12,
+    )
+    create_at = models.DateField(auto_now_add=True)
 
 
 class MusicProfile(models.Model):
-    user = models.OneToOne(CustomUser, on_delete=models.CASCADE, related_name='music_profile')
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="music_profile"
+    )
     rock_points = models.DecimalField(decimal_places=1, default=Decimal(0))
     pop_points = models.DecimalField(decimal_places=1, default=Decimal(0))
     jazz_points = models.DecimalField(decimal_places=1, default=Decimal(0))
