@@ -1,34 +1,9 @@
 from django.db import models
 from auth_app.models import CustomUser
+from genres import GenreChoices
 
 
 class Song(models.Model):
-    class GenreChoices(models.TextChoices):
-        ROCK = ("rock", "Rock")
-        POP = ("pop", "Pop")
-        JAZZ = ("jazz", "Jazz")
-        BLUES = ("blues", "Blues")
-        HIP_HOP = ("hip-hop", "Hip-Hop")
-        RAP = ("rap", "Rap")
-        CLASSICAL = ("classical", "Classical")
-        ELECTRONIC = ("electronic", "Electronic")
-        HOUSE = ("house", "House")
-        TECHNO = ("techno", "Techno")
-        METAL = ("metal", "Metal")
-        PUNK = ("punk", "Punk")
-        COUNTRY = ("country", "Country")
-        REGGAE = ("reggae", "Reggae")
-        FOLK = ("folk", "Folk")
-        RNB = ("r&b", "R&B")
-        SOUL = ("soul", "Soul")
-        DISCO = ("disco", "Disco")
-        TRAP = ("trap", "Trap")
-        DRUM_AND_BASS = ("drum and bass", "Drum and Bass")
-        INDIE = ("indie", "Indie")
-        LOFI = ("lo-fi", "Lo-fi")
-        AMBIENT = ("ambient", "Ambient")
-        SOUNDTRACK = ("soundtrack", "Soundtrack")
-
     title = models.CharField(max_length=128)
     singer = models.ForeignKey(
         CustomUser,
