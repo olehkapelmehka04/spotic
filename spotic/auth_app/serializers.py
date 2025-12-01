@@ -78,4 +78,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ("username", "email", "tasks")
+        fields = (
+            "username",
+            "email",
+        )

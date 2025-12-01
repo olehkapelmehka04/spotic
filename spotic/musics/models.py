@@ -9,4 +9,4 @@ class Track(models.Model):
     singer = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="tracks"
     )
-    genre = models.CharField(choices=Genre.choices())
+    # genre = models.CharField(choices=Genre.choices())

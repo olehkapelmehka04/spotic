@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from musics.models import Track
 
 class CustomUser(AbstractUser):
 
@@ -66,4 +66,3 @@ class MusicProfile(models.Model):
     ambient_points = models.DecimalField(decimal_places=1, default=Decimal(0))
     soundtrack_points = models.DecimalField(decimal_places=1, default=Decimal(0))
 
-    
