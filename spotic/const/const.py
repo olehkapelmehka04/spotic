@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Genre(models.Choices):
     ROCK = "Rock"
     POP = "Pop"
@@ -25,3 +26,7 @@ class Genre(models.Choices):
     LOFI = "Lo-fi"
     AMBIENT = "Ambient"
     SOUNDTRACK = "Soundtrack"
+
+    @classmethod
+    def choices(cls):
+        return [(name, member.value) for name, member in cls.__members__.items()]
