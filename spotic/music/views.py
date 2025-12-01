@@ -1,17 +1,14 @@
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.views import APIView
 from rest_framework import status, exceptions
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from .models import Song, Playlist, SongEstimation
 from .serializers import (
     SongSerializer,
     SongEstimationSerializer,
     PlaylistSerializer,
-    PlaylistSongSerializer,
 )
-from .models import Song, Playlist, SongEstimation
 
 
 class CreateSongAPIView(APIView):
@@ -64,7 +61,18 @@ class FindByGenre(APIView):
 
 class MyWave(APIView):
     def get(self, request):
-        pass
+        user_genres = request.user.genres
+        if not user_genres:
+            return Response({'songs': 'No songs'}, status=status.HTTP_200_OK)
+        user_rated_song_ids = SongEstimation.objects.filter(listener=request.user).values_list('id', flat=True)
+        candidate_songs = Song.objects.filter(genre__in=user_genres).exclude(id__in=user_rated_song_ids)
+        liked_by_others = (SongEstimation.objects.filter(song__in=candidate_songs, estimation='liked')
+                           .exclude(listener=request.user)
+                           .values_list('id', flat=True))
+        if not liked_by_others:
+            return Response({"songs": SongSerializer(candidate_songs.order_by('-release_date')[:10], many=True).data}, status=status.HTTP_200_OK)
+        recommended_songs = candidate_songs.filter(id__in=liked_by_others).order_by('-release_date')[:10]
+        return Response({"songs": SongSerializer(recommended_songs, many=True).data}, status=status.HTTP_200_OK)
 
 
 class RateSong(APIView):
