@@ -4,7 +4,6 @@ from django.contrib.auth.models import AbstractUser
 
 
 class CustomUser(AbstractUser):
-    class 
     
     role = models.CharField(
         max_length=20,
