@@ -97,3 +97,16 @@ class PlaylistSong(models.Model):
 
     def __str__(self):
         return f"{self.song.title} in {self.playlist.playlist_name}"
+
+
+class MusicEstimation(models.Model):
+    music = models.ForeignKey(
+        Song,
+        on_delete=models.CASCADE,
+    )
+    estimation = models.CharField(
+        choices=[("dislike", "Дизлайк"), ("like", "Лайк"), ("listen", "Прослушан")]
+    )
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="musicestimations"
+    )
