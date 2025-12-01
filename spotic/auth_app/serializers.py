@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.authentication import authenticate
+import re
 
 from .models import CustomUser
 
@@ -50,8 +51,8 @@ class LoginSerializer(serializers.Serializer):
     def validate_username(self, value):
         if not value:
             raise serializers.ValidationError("Вы не ввели username")
-        cheak_username = CustomUser.objects.filter(username=value).exists()
-        if not cheak_username:
+        check_username = CustomUser.objects.filter(username=value).exists()
+        if not check_username:
             raise serializers.ValidationError("Такого пользователя не существует")
         return value
 
@@ -74,11 +75,41 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = (
             "username",
             "email",
+            'password'
+            'role',
+            'status'
         )
+        extra_kwargs = {'password': {'write_only': True}}
+
+        def create(self, validated_data):
+            user = CustomUser(
+                email=validated_data['email'],
+                username=validated_data['username']
+            )
+            user.set_password(validated_data['password'])
+            user.save()
+            return user
+
+        def validate_username(self, value):
+            if len(value) < 8:
+                raise serializers.ValidationError('Введите username больше 8 символов')
+            raise value
+
+        def validate_password(self, value):
+            VALID_SPEC_SYMB = r'!@#$%^&*_+\-,./?:;"\'~`|\\'
+            VALID_UPPERCASE_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            if len(value) < 8:
+                raise serializers.ValidationError('Введите пароль больше 8 символов')
+            has_special_char = any(char in VALID_SPEC_SYMB for char in value)
+            if not has_special_char:
+                raise serializers.ValidationError("Введите хотя-бы 1 спец символ")
+            has_uppercase_letter = any(char in VALID_UPPERCASE_LETTERS for char in value)
+            if not has_uppercase_letter:
+                raise serializers.ValidationError("Введите хотя-бы одну заглавную букву")
+            return value

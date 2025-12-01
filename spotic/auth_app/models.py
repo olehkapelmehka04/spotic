@@ -13,6 +13,7 @@ class CustomUser(AbstractUser):
             ("singer", "Исполнитель"),
             ("admin", "Администратор"),
         ],
+        default='listener'
     )
     status = models.CharField(
         max_length=20,
