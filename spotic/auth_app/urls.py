@@ -3,6 +3,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("register/", views.RegiserAPIView.as_view()),
+    path("register/", views.RegisterAPIView.as_view()),
     path("login/", views.LoginAPIView.as_view()),
+    path('add-genre/', views.AddGenreToUserAPIView.as_view()),
+    path('users/', views.UsersAPIView.as_view()),
 ]

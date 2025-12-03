@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.authentication import authenticate
 import re
 
+from music.serializers import GenreSerializer
 from .models import CustomUser
 
 
@@ -76,6 +77,9 @@ class LoginSerializer(serializers.Serializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+
+    genres = GenreSerializer(many=True, read_only=True)
+
     class Meta:
         model = CustomUser
-        fields = ("username", "email", "role")
+        fields = ("username", "email", "role", "genres")

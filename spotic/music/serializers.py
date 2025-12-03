@@ -1,6 +1,7 @@
 from rest_framework import serializers
+
+from auth_app.models import CustomUser, Genre
 from .models import Song, SongEstimation, Playlist, PlaylistSong
-from auth_app.models import CustomUser
 
 
 class SongSerializer(serializers.ModelSerializer):
@@ -66,3 +67,9 @@ class PlaylistSongSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlaylistSong
         fields = ["playlist", "playlist_id", "song", "song_id"]
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ['id', 'name', 'display_name']

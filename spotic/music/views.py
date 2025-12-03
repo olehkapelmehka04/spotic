@@ -3,11 +3,12 @@ from rest_framework import status, exceptions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from auth_app.models import Genre
 from .models import Song, Playlist, SongEstimation
 from .serializers import (
     SongSerializer,
     SongEstimationSerializer,
-    PlaylistSerializer,
+    PlaylistSerializer, GenreSerializer,
 )
 
 
@@ -90,3 +91,17 @@ class RateSongAPIView(APIView):
             return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         serializer.save(listener=request.user, song=song)
         return Response({"estimated": serializer.data}, status=status.HTTP_201_CREATED)
+
+
+class CreateGenreApiView(APIView):
+    def post(self, request):
+        serializer = GenreSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({'error': 'Incorrect data'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response({'genre': serializer.data}, status=status.HTTP_201_CREATED)
+
+
+class GenresApiView(APIView):
+    def get(self, request):
+        return Response({'genres': GenreSerializer(Genre.objects.all(), many=True).data}, status=status.HTTP_200_OK)

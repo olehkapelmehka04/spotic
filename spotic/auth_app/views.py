@@ -1,13 +1,12 @@
-from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-
+from .models import CustomUser
 from .serializers import RegisterSerializer, ProfileSerializer, LoginSerializer
 
 
-class RegiserAPIView(APIView):
+class RegisterAPIView(APIView):
     def post(self, request):
         user = RegisterSerializer(data=request.data)
         if user.is_valid():
@@ -36,4 +35,18 @@ class LoginAPIView(APIView):
                     "access": str(refresh.access_token),
                 },
             )
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)  # type: ignore
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # type: ignore
+
+
+class AddGenreToUserAPIView(APIView):
+    def patch(self, request):
+        is_added = request.user.add_genre(request.data['name'])
+        if not is_added:
+            return Response({'error': 'genre is not added'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'user': ProfileSerializer(request.user).data}, status=status.HTTP_200_OK)
+
+
+class UsersAPIView(APIView):
+    def get(self, request):
+        return Response({'users': ProfileSerializer(CustomUser.objects.all(), many=True).data}, status=status.HTTP_200_OK)
+
