@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework import status
@@ -7,7 +6,7 @@ from rest_framework.response import Response
 from .serializers import RegisterSerializer, ProfileSerializer, LoginSerializer
 
 
-class RegiserAPIView(APIView):
+class RegisterAPIView(APIView):
     def post(self, request):
         user = RegisterSerializer(data=request.data)
         if user.is_valid():

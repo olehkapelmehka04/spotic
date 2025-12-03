@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from rest_framework.authentication import authenticate
-import re
 
 from .models import CustomUser
 
@@ -25,8 +24,8 @@ class RegisterSerializer(serializers.Serializer):
         return attrs
 
     def validate_email(self, value):
-        cheak_email = CustomUser.objects.filter(email=value).exists()
-        if cheak_email:
+        check_email = CustomUser.objects.filter(email=value).exists()
+        if check_email:
             raise serializers.ValidationError(
                 "Пользователь с такой почтой уже существует"
             )

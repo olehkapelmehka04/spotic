@@ -55,7 +55,7 @@ class SongEstimation(models.Model):
         CustomUser,
         on_delete=models.CASCADE,
         limit_choices_to={"role": "listener"},
-        related_name="estimations",
+        related_name="estimations"
     )
     song = models.ForeignKey(Song, on_delete=models.CASCADE, related_name="estimations")
     estimation = models.CharField(max_length=20, choices=EstimationChoices)

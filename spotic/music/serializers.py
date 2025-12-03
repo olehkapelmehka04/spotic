@@ -12,13 +12,7 @@ class SongSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Song
-        fields = [
-            "title",
-            "singer_id",
-            "duration",
-            "genre",
-            "release_date",
-        ]
+        fields = ["title", "singer_id", "duration", "genre", "release_date"]
 
 
 class SongEstimationSerializer(serializers.ModelSerializer):

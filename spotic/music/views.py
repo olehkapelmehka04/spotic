@@ -1,16 +1,8 @@
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework import status, exceptions
 from rest_framework.response import Response
-
-from .serializers import (
-    SongSerializer,
-    SongEstimationSerializer,
-    PlaylistSerializer,
-    PlaylistSongSerializer,
-)
+from .serializers import SongSerializer, SongEstimationSerializer, PlaylistSerializer, PlaylistSongSerializer
 from .models import Song, Playlist, SongEstimation, PlaylistSong
 
 
