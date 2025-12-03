@@ -48,41 +48,45 @@ class PlaylistAPIView(APIView):
         return Response(PlaylistSerializer(playlist).data)
 
 
-class FindByGenre(APIView):
+def recommend_response(data):
+    return Response({'songs': data}, status=status.HTTP_200_OK)
+
+
+class FindByGenreAPIView(APIView):
     def get(self, request):
-        genre = request.GET.get("genre")
+        genre = request.GET.get('genre')
         if not genre:
-            return Response({"error": "No genre"}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(
-            {"songs": SongSerializer(Song.objects.filter(genre=genre), many=True).data},
-            status=status.HTTP_200_OK,
-        )
+            return Response({'error': 'Genre not selected'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            "songs": SongSerializer(
+                Song.objects.filter(genre=genre), many=True).data
+        }, status=status.HTTP_200_OK)
 
 
-class MyWave(APIView):
+class MyWaveAPIView(APIView):
     def get(self, request):
         user_genres = request.user.genres
         if not user_genres:
-            return Response({'songs': 'No songs'}, status=status.HTTP_200_OK)
-        user_rated_song_ids = SongEstimation.objects.filter(listener=request.user).values_list('id', flat=True)
-        candidate_songs = Song.objects.filter(genre__in=user_genres).exclude(id__in=user_rated_song_ids)
-        liked_by_others = (SongEstimation.objects.filter(song__in=candidate_songs, estimation='liked')
-                           .exclude(listener=request.user)
-                           .values_list('id', flat=True))
+            return recommend_response('No genres')
+        user_rated_song = SongEstimation.objects.filter(listener=request.user).values_list('id', flat=True)
+        if not user_rated_song:
+            return recommend_response(SongSerializer(Song.objects.filter(genre__in=user_genres)[:10]).data)
+        candidate_songs = Song.objects.filter(genre__in=user_genres).exclude(id__in=user_rated_song)
+        if not candidate_songs:
+            return recommend_response(SongSerializer(Song.objects.filter(genre__in=user_genres)[:10]).data)
+        liked_by_others = SongEstimation.objects.filter(id__in=candidate_songs, estimation='liked').values_list('id', flat=True)
         if not liked_by_others:
-            return Response({"songs": SongSerializer(candidate_songs.order_by('-release_date')[:10], many=True).data}, status=status.HTTP_200_OK)
+            return recommend_response(SongSerializer(candidate_songs.order_by('-release_date')[:10], many=True).data)
         recommended_songs = candidate_songs.filter(id__in=liked_by_others).order_by('-release_date')[:10]
-        return Response({"songs": SongSerializer(recommended_songs, many=True).data}, status=status.HTTP_200_OK)
+        return recommended_songs(SongSerializer(recommended_songs, many=True).data)
 
 
-class RateSong(APIView):
+class RateSongAPIView(APIView):
     def post(self, request, song_id):
         song = get_object_or_404(Song, id=song_id)
         SongEstimation.objects.filter(listener=request.user, song=song).delete()
         serializer = SongEstimationSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(
-                {"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         serializer.save(listener=request.user, song=song)
         return Response({"estimated": serializer.data}, status=status.HTTP_201_CREATED)
