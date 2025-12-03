@@ -36,4 +36,4 @@ class LoginAPIView(APIView):
                     "access": str(refresh.access_token),
                 },
             )
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)  # type: ignore
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # type: ignore

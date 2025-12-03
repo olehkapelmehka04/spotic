@@ -11,7 +11,7 @@ from .serializers import (
     PlaylistSerializer,
     PlaylistSongSerializer,
 )
-from .models import Song, Playlist, SongEstimation
+from .models import Song, Playlist, SongEstimation, PlaylistSong
 
 
 class CreateSongAPIView(APIView):
@@ -48,7 +48,36 @@ class PlaylistAPIView(APIView):
         if playlist.visibility == "private":
             if playlist.owner != request.user:
                 raise exceptions.PermissionDenied("У вас нет доступа к этому плейлисту")
-        return Response(PlaylistSerializer(playlist).data)
+        return Response(PlaylistSongSerializer(playlist).data)
+
+
+class AddSongPlaylist(APIView):
+    def post(self, request, playlist_id, song_id):
+        playlist = get_object_or_404(Playlist, id=playlist_id)
+        song = get_object_or_404(Song, id=song_id)
+
+        if playlist.visibility == "private" and playlist.owner != request.user:
+            raise exceptions.PermissionDenied(
+                "У вас нет доступа к этому приватному плейлисту"
+            )
+
+        if PlaylistSong.objects.filter(playlist=playlist, song=song).exists():
+            return Response(
+                {
+                    "error": "Эта песня уже есть в плейлисте",
+                    "playlist": playlist.playlist_name,
+                    "song": song.title,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        playlist_song = PlaylistSong.objects.create(playlist=playlist, song=song)
+
+        serializer = PlaylistSongSerializer(playlist_song)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class FindByGenre(APIView):
